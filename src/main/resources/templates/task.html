@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="common/header :: header">
+
+</head>
+<body>
+	<div th:replace="common/header :: navbar">
+		<!-- Navbar -->
+	</div>
+	<div class="container space">
+		<button id="addBtn" type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#addModal">
+			<i class="fas fa-plus-circle"></i>New Task
+		</button>
+		<form class="form-inline my-2 my-lg-0" id="search" th:action="@{/taskList}">
+		      <input class="form-control mr-sm-2" type="number" placeholder="Search By Employee Id" aria-label="Search" name="employeeId">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
+		 </form>
+		<table class="table">
+			<thead class="thead-dark">
+				<tr>
+					<th scope="col">Employee Id</th>
+					<th scope="col">Employee</th>
+					<th scope="col">Title</th>
+					<th scope="col">Start Date</th>
+					<th scope="col">Expected Finish Date</th>
+					<th scope="col">Status</th>
+					<th scope="col">Edit</th>
+					<th scope="col">Delete</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="task:${tasks}">
+					<td th:text="${task.employee.id}"></td>
+					<td th:text="${task.employee.firstName} + ' ' + ${task.employee.lastName}"></td>
+					<td th:text="${task.title}"></td>
+					<td th:text="${task.startDate}"></td>
+					<td th:text="${task.expectedFinishDate}"></td>
+					<td th:text="${task.taskStatus.status}"></td>
+					<td><a th:href="@{/selectedTask/(id = ${task.id})}" class="btn btn-primary" id="editButton"><i class="far fa-edit"></i></a></td>
+					<td><a th:href="@{/deleteTask/(id = ${task.id})}" class="btn btn-danger" id="deleteButton"><i class="fas fa-trash"></i></a></td>
+				</tr>
+
+			</tbody>
+		</table>
+	</div>
+	<!-- Add Modal -->
+	<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+		aria-labelledby="addModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Add New Task</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"> 
+					     <span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/createTask}" th:obejct="${task}" method="post">
+						<div class="form-group">
+							 <label for="employee" class="col-form-label">Select Employee:</label> 
+							  <select class="form-control validate" id="employeeAdd" name="employee_id" required>
+					              <option></option>
+				                  <option th:each="employee:${employees}"
+				                      th:value="${employee.id}" th:text="${employee.firstName} + ' ' + ${employee.lastName}">
+				                  </option>
+  					          </select>
+  					          <div class="valid-feedback">Success</div>
+                            <div class="invalid-feedback">Please select employee to add task</div>
+						</div>
+						<div class="form-group">
+							<label for="title" class="col-form-label">Title:</label> 
+							<input type="text" class="form-control validate" id="title" name="title" required>
+							<div class="valid-feedback">Success</div>
+                            <div class="invalid-feedback">Please fill this field</div>
+						</div>
+						<div class="form-group">
+							<label for="description" class="col-form-label">Description:</label> 
+							<textarea class="form-control validate" id="description" name="description" required></textarea>
+							<div class="valid-feedback">Success</div>
+                            <div class="invalid-feedback">Please fill this field</div>
+						</div>
+						<div class="form-group row">
+						   <div class="col-sm-6">
+						       <label for="startDate" class="col-form-label">Start Date:</label> 
+							  <input type="date" class="form-control validate" id="startDate" name="startDate" required>
+							  <div class="valid-feedback">Success</div>
+                              <div class="invalid-feedback">Please fill this field</div>
+						   </div>
+						   <div class="col-sm-6">
+						       <label for="expectedFinishDate" class="col-form-label">Expected Finish Date:</label> 
+							  <input type="date" class="form-control validate" id="expectedFinishDate" name="expectedFinishDate" required>
+							  <div class="valid-feedback">Success</div>
+                              <div class="invalid-feedback">Please fill this field</div>
+						   </div>
+						</div>
+						<input type="submit" class="btn btn-primary" id="submit" name="submit" value="Submit">
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Edit Modal -->
+	<div class="modal fade" id="editModal" tabindex="-1" role="dialog"
+		aria-labelledby="editModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editModalLabel">Edit Task</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/updateTask}" method="put">
+						<div class="form-group">
+							<input type="text" class="form-control" id="idEdit" name="id" readonly="readonly">
+						</div>
+						<div class="form-group">
+							 <label for="employee" class="col-form-label">Select Employee:</label> 
+							  <select class="form-control validate" id="employeeAddEdit" name="employee_id" required>
+				                  <option th:each="employee:${employees}"
+				                      th:value="${employee.id}" th:text="${employee.firstName} + ' ' + ${employee.lastName}" >
+				                  </option>
+  					          </select>
+  					          <div class="valid-feedback">Success</div>
+                              <div class="invalid-feedback">Please select employee to add task</div>
+						</div>
+						<div class="form-group">
+							<label for="title" class="col-form-label">Title:</label> 
+							<input type="text" class="form-control validate" id="titleEdit" name="title" required>
+							<div class="valid-feedback">Success</div>
+                            <div class="invalid-feedback">Please fill out the field</div>
+						</div>
+						<div class="form-group">
+							<label for="description" class="col-form-label">Description:</label> 
+							<textarea class="form-control validate" id="descriptionEdit" name="description" required></textarea>
+							<div class="valid-feedback">Success</div>
+                            <div class="invalid-feedback">Please fill out the field</div>
+						</div>
+						<div class="form-group row">
+						   <div class="col-sm-6">
+						       <label for="startDate" class="col-form-label">Start Date:</label> 
+							  <input type="date" class="form-control validate" id="startDateEdit" name="startDate" required>
+							  <div class="valid-feedback">Success</div>
+                            <div class="invalid-feedback">Please fill out the field</div>
+						   </div>
+						   <div class="col-sm-6">
+						       <label for="expectedFinishDate" class="col-form-label">Expected Finish Date:</label> 
+							  <input type="date" class="form-control validate" id="expectedFinishDateEdit" name="expectedFinishDate" required>
+							  <div class="valid-feedback">Success</div>
+                            <div class="invalid-feedback">Please fill out the field</div>
+						   </div>
+						 </div>  
+						<input type="submit" class="btn btn-primary" id="submit"
+							name="submit" value="Submit">
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Delete Modal -->
+	<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+		aria-labelledby="deleteModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Delete Task</h5>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+				     Are you that you want to delete this task?
+				</div>
+				<div class="modal-footer">
+					<a href="" id="confirmDeleteButton" class="btn btn-danger">Yes</a>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:replace="common/header :: script">
+		<!-- Script -->
+	</div>
+	<script src="js/task.js"></script>
+	<script src="js/validation.js"></script>
+</body>
+</html>
